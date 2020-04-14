@@ -857,15 +857,30 @@ void SDMMCAnalyzerResults::GenerateFrameTabularText(U64 frame_index, DisplayBase
 {
 	ClearTabularText();
 	Frame frame = GetFrame(frame_index);
-	if (frame.mType != FRAMETYPE_COMMAND)
-		return;
-	char str_cmd[33];
-	char str_arg[33];
-	const char *str_desc;
-	AnalyzerHelpers::GetNumberString(frame.mData1, Decimal, 6, str_cmd, sizeof(str_cmd));
-	AnalyzerHelpers::GetNumberString(frame.mData2, display_base, 32, str_arg, sizeof(str_arg));
-	str_desc = SDMMCHelpers::MMCCommandDescription(frame.mData1, frame.mData2);
-	AddTabularText("CMD", str_cmd, ", arg=", str_arg, " ", str_desc);
+	//if (frame.mType != FRAMETYPE_COMMAND)
+	//	return;
+    char str_cmd[33];
+    char str_arg[33];
+    const char *str_desc;
+    std::string str_rdesc;
+    switch(frame.mType) {
+        case FRAMETYPE_COMMAND:
+            AnalyzerHelpers::GetNumberString(frame.mData1, Decimal, 6, str_cmd, sizeof(str_cmd));
+            AnalyzerHelpers::GetNumberString(frame.mData2, display_base, 32, str_arg, sizeof(str_arg));
+            str_desc = SDMMCHelpers::MMCCommandDescription(frame.mData1, frame.mData2);
+            AddTabularText("CMD", str_cmd, ", arg=", str_arg, " ", str_desc);
+            break;
+        case FRAMETYPE_RESPONSE:
+            AnalyzerHelpers::GetNumberString(frame.mFlags, Decimal, 6, str_cmd, sizeof(str_cmd));
+            AnalyzerHelpers::GetNumberString(frame.mData2, display_base, 32, str_arg, sizeof(str_arg));
+            str_rdesc = SDMMCHelpers::MMCResponseDescription(frame.mFlags, frame.mData1, frame.mData2, display_base);
+            //AddTabularText("R", str_cmd, ", arg=", str_arg, " ", str_rdesc.c_str());
+            AddTabularText(str_rdesc.c_str());
+            break;
+        default:
+            return;
+    }
+
 }
 
 void SDMMCAnalyzerResults::GeneratePacketTabularText(U64 packet_id, DisplayBase display_base)

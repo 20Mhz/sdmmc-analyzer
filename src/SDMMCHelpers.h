@@ -92,6 +92,7 @@ public:
 	static U8 crc7(const U8 *data, unsigned int size);
 	static struct MMCResponse MMCCommandResponse(unsigned int index);
 	static const char * MMCCommandDescription(unsigned int index, unsigned int args);
+    static std::string  MMCResponseDescription(unsigned int mFlags, unsigned int mData1, unsigned int mData2, DisplayBase display_base);
 
 private:
 	static U8 __crc7(U8 crc, U8 data);
